@@ -22,23 +22,22 @@ body {
 /* ---------------------------------------------------------------- */
 
 .my-category {
-  flex: 1;
+  flex: 0.8;
   background-color: lightgray;
+  border-radius: 20px;
 }
 .main-nav-list {
-  padding: 20px 0;
+  padding: 50px 0;
 
   list-style: none;
   color: darkgrey;
   font-size: 36px;
 }
 .main-nav-list-item {
-  border-top: 0.5px solid darkgray;
+  border-bottom: 0.5px solid darkgray;
   padding: 20px;
 }
-.main-nav-list-item:last-child {
-  border-bottom: 0.5px solid darkgray;
-}
+
 .main-nav-list-item-link {
   display: flex;
   align-items: center;
@@ -47,6 +46,12 @@ body {
 }
 .main-nav-list-item-link-icon {
   margin-right: 10px;
+}
+
+.current-page {
+  background-color: lightblue;
+  color: black;
+  fill: black;
 }
 
 /* ---------------------------------------------------------------- */
@@ -60,10 +65,17 @@ body {
 /* ---------------------------------------------------------------- */
 main {
   display: flex;
-  justify-content: space-between;
-  height: 40vh;
-  flex: 4;
+  flex-direction: column;
+  flex: 2;
   gap: 30px;
+}
+
+#personal-intro {
+  display: flex;
+  justify-content: space-between;
+  border: 1px solid lightgrey;
+  border-radius: 10px;
+  padding: 20px 60px;
 }
 /* ---------------------------------------------------------------- */
 /* ---------------------------------------------------------------- */
@@ -80,7 +92,6 @@ main {
   flex-direction: column;
   justify-content: space-between;
   text-align: center;
-  flex: 1;
 }
 
 #personal-image {
@@ -104,7 +115,9 @@ main {
   display: flex;
   flex-direction: column;
   gap: 50px;
-  flex: 2;
+  padding: 20px;
+  border: 1px solid lightgrey;
+  border-radius: 10px;
 }
 #introduce header {
   margin-bottom: 10px;
@@ -125,7 +138,6 @@ main {
 /* ---------------------------------------------------------------- */
 /* ---------------------------------------------------------------- */
 #my-skill {
-  flex: 2;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
