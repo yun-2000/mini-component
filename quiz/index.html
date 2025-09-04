@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quiz</title>
+  </head>
+  <body>
+    <header class="quiz-header">
+      <h1 class="quiz-title">Quiz <span class="quiz-num">1</span></h1>
+    </header>
+    <form class="quiz-form">
+      <p class="question">Question</p>
+      <div class="answer-container">
+        <div class="answer-1">
+          <input type="radio" name="answer" />
+          <label for="answer">Answer1</label>
+        </div>
+      </div>
+      <button>Next-></button>
+    </form>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      .quiz-form {
+        width: 500px;
+
+        display: flex;
+        flex-direction: column;
+
+        gap: 20px;
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+    <script>
+      const quizNum = document.querySelector(".quiz-num");
+      const quizForm = document.querySelector(".quiz-form");
+      const question = document.querySelector(".question");
+      const answers = document.querySelector(".answer-container");
+
+      const quiz_bank = [
+        {
+          type: "single-choice",
+          question: "2+2=?",
+          answers: ["1", "2", "3", "4"],
+          correct_answer: ["4"]
+        },
+        {
+          type: "multiple-choice",
+          question: "I own: ",
+          answers: ["Phone", "Laptop", "Keys"],
+          correct_answer: ["Phone", "Laptop", "Keys"]
+        }
+      ];
+
+      function display_question(quiz) {
+        // console.log(quiz);
+        const question_type =
+          quiz.type === "single-choice" ? "radio" : "checkbox";
+        question.innerHTML = quiz.question;
+        answers.innerHTML = "";
+        answers.innerHTML += quiz.answers
+          .map((answer, i) => {
+            return `
+            <div class="answer-${i}">
+                <input type="${question_type}" id="answer-${i}" name="answer" class="options" data-answer="${answer}"/>
+                <label for="answer-${i}" >${answer}</label>
+            </div>
+          `;
+          })
+          .join("");
+      }
+      function calculateMarks(e, correct_answer) {
+        e.preventDefault();
+        let userAnswers = [];
+        const options = document.querySelectorAll(".options");
+
+        options.forEach((option) => {
+          if (option.checked) {
+            userAnswers.push(option.dataset.answer);
+          }
+        });
+        if (userAnswers.length !== correct_answer.length) return false;
+        for (let i = 0; i < userAnswers.length; i++) {
+          if (
+            userAnswers[i].sort((a, b) => a - b) !==
+            correct_answer[i].sort((a, b) => a - b)
+          )
+            return false;
+        }
+        return true;
+      }
+
+      let current_index = localStorage.getItem("question_index") || 0;
+      localStorage.setItem("question_index", current_index);
+
+      display_question(quiz_bank[current_index]);
+
+      quizForm.addEventListener("submit", (e) => {
+        const marks = calculateMarks(
+          e,
+          quiz_bank[current_index].correct_answer
+        );
+        current_index += 1;
+        localStorage.setItem("question_index", current_index);
+        if (current_index <= quiz_bank.length) {
+          display_question(quiz_bank[current_index]);
+        }
+      });
+    </script>
+  </body>
+</html>
