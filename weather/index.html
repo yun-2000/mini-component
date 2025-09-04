@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Weather</title>
+  </head>
+  <body>
+    <main class="dashboard">
+      <section class="current-weather">
+        <form class="current-city-form">
+          <label for="city">Your city</label>
+          <input type="text" id="city" value="Sydney" />
+        </form>
+        <div class="current-weather-container">
+          <p class="current-time sub-header"></p>
+          <div class="current-weather-status">
+            <img class="current-weather-icon" alt="weather icon" />
+            <p class="current-weather-temperature">
+              <span class="current-weather-temperature-celsius">1</span>&deg;C
+            </p>
+          </div>
+          <div class="current-weather-stats">
+            <div class="current-weather-humidity">
+              <h4 class="sub-header">Humidity</h4>
+              <span class="current-weather-humidity-percent">1%</span>
+            </div>
+            <div class="current-weather-wind-speed">
+              <h4 class="sub-header">Wind Speed</h4>
+              <span class="current-weather-wind-speed-percent">11</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="temperature-forecast"></section>
+      <section class="future-weather"></section>
+      <!-- <div class="dashboard"></div> -->
+    </main>
+    <style>
+      :root {
+        --primary-font-color: black;
+        --secondary-font-color: lightgrey;
+        --dashboard-color: white;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      body {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        background-color: var(--secondary-font-color);
+      }
+      .sub-header {
+        color: var(--secondary-font-color);
+        font-weight: 400;
+      }
+      .dashboard {
+        background-color: var(--dashboard-color);
+        padding: 30px 20px;
+      }
+      .current-city-form {
+        margin-bottom: 50px;
+      }
+      .current-weather-container {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+      }
+      .current-weather-status {
+        display: flex;
+      }
+      .current-weather-stats {
+        display: flex;
+        gap: 30px;
+      }
+      .current-weather-humidity {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .current-weather-wind-speed {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+    </style>
+    <script>
+      const weatherIcon = document.querySelector(".current-weather-icon");
+      const current_date = document.querySelector(".current-time");
+      const cityForm = document.querySelector(".current-city-form");
+      const current_temperature = document.querySelector(
+        ".current-weather-temperature-celsius"
+      );
+      const current_humidity = document.querySelector(
+        ".current-weather-humidity-percent"
+      );
+      const current_windSpeed = document.querySelector(
+        ".current-weather-wind-speed-percent"
+      );
+
+      //URL Setting
+      const API_key = "12f4db92ca68b431e8dad31961befda4";
+      function makeCityUrl() {
+        const city_name = document
+          .querySelector(".current-city-form input[type='text']")
+          .value.trim();
+        const limit = 1;
+        const city_url = `http://api.openweathermap.org/geo/1.0/direct?q=${city_name}&limit=${limit}&appid=${API_key}`;
+        return city_url;
+      }
+
+      function displayDate() {
+        const current_date = new Date();
+
+        //get time
+        let hour = current_date.getHours();
+        const AM_PM = hour > 12 ? "PM" : "AM";
+        hour = hour % 12 === 0 ? 12 : hour % 12;
+        const minute = current_date.getMinutes();
+
+        //get date
+        const year = current_date.getFullYear();
+        const day = current_date.getDate();
+        // console.log(day);
+        //get weekday
+        const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
+        const weekday = days[current_date.getDay()];
+        //get month
+        const months = [
+          "Jan",
+          "Feb",
+          "Mar",
+          "Apr",
+          "May",
+          "Jun",
+          "Jul",
+          "Aug",
+          "Sep",
+          "Oct",
+          "Nov",
+          "Dec"
+        ];
+        const month = months[current_date.getMonth()];
+
+        //combine date and time
+        const now = `${hour.toString().padStart(2, "0")}:${minute
+          .toString()
+          .padStart(2, "0")} ${AM_PM}, ${weekday}, ${month}, ${year}`;
+        return now;
+      }
+
+      async function getData(url) {
+        const city_stats = await fetch(url);
+        const city_data = await city_stats.json();
+        const lon = city_data[0].lon;
+        const lat = city_data[0].lat;
+        let weather_url = `https://api.openweathermap.org/data/3.0/onecall?lat=${lat}&lon=${lon}&appid=${API_key}`;
+        const weather_stats = await fetch(weather_url);
+        const weather_data = await weather_stats.json();
+
+        //Current Weather Data
+        const current_weather = weather_data.current;
+        const temperature = `${(current_weather.temp - 273.15).toFixed(1)}`;
+        const sunset = new Date(current_weather.sunset * 1000).toLocaleString();
+        const sunrise = new Date(
+          current_weather.sunrise * 1000
+        ).toLocaleString();
+        const humidity = `${current_weather.humidity}%`;
+        const windSpeed = `${current_weather.wind_speed} km/j`;
+        // console.log(windSpeed);
+        current_temperature.innerHTML = temperature;
+        current_humidity.innerHTML = humidity;
+        current_windSpeed.innerHTML = windSpeed;
+
+        // console.table(`current ${JSON.stringify(weather_data.current)}`);
+        // console.table(`minutes: ${JSON.stringify(weather_data.minutely)}`);
+        // console.table(`hourly: ${JSON.stringify(weather_data.hourly)}`);
+        // console.table(`daily: ${JSON.stringify(weather_data.daily)}`);
+        //current, daily,minutely,hourly
+
+        //Get ICON
+        const icon = current_weather.weather[0].icon;
+        const iconUrl = `https://openweathermap.org/img/wn/${icon}@2x.png`;
+        weatherIcon.src = iconUrl;
+        weatherIcon.alt = current_weather.weather[0].description;
+      }
+      getData(makeCityUrl());
+
+      current_date.innerHTML = displayDate();
+      cityForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        getData(makeCityUrl());
+      });
+    </script>
+  </body>
+</html>
